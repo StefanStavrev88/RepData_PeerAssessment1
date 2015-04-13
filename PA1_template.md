@@ -1,4 +1,9 @@
-# Reproducible Research: Peer Assessment 1
+---
+title: "Reproducible Research: Peer Assessment 1"
+output: 
+  html_document:
+    keep_md: true
+---
 
 
 Author: Stefan Stavrev
@@ -126,7 +131,7 @@ abline(v=stepsPerDayMedian, lwd = 2, col = "chocolate1")
 legend("topright", lty = 1, lwd = 2, col = c("chartreuse3", "chocolate1"), legend = c(paste("Mean:", stepsPerDayMean), paste("Median:", stepsPerDayMedian)))
 ```
 
-![](PA1_template_files/figure-html/unnamed-chunk-5-1.png) 
+![plot of chunk unnamed-chunk-5](figure/unnamed-chunk-5-1.png) 
 
 ## What is the average daily activity pattern?
 
@@ -152,7 +157,7 @@ maxAvgSteps$avgSteps <- as.integer(maxAvgSteps$avgSteps)
 points(maxAvgSteps$interval,  maxAvgSteps$avgSteps, col = 'firebrick2', lwd = 2, pch = 19)
 ```
 
-![](PA1_template_files/figure-html/unnamed-chunk-6-1.png) 
+![plot of chunk unnamed-chunk-6](figure/unnamed-chunk-6-1.png) 
 
 
 ```r
@@ -280,7 +285,7 @@ abline(v=stepsPerDay2Median, lwd = 2, col = "chocolate1")
 legend("topright", lty = 1, lwd = 2, col = c("chartreuse3", "chocolate1"), legend = c(paste("Mean:", stepsPerDay2Mean), paste("Median:", stepsPerDay2Median)))
 ```
 
-![](PA1_template_files/figure-html/unnamed-chunk-14-1.png) 
+![plot of chunk unnamed-chunk-14](figure/unnamed-chunk-14-1.png) 
 
 Question 1: Do these values differ from the estimates from the first part of the assignment?
 
@@ -339,4 +344,4 @@ dataWithoutNA2 = dataWithoutNA[, list(avgSteps = mean(steps, na.rm = TRUE)), by 
 xyplot(avgSteps~interval | weekDayOrEnd, data = dataWithoutNA2, type = "l", xlab = 'Interval', ylab = 'Number of Steps', layout = c(1,2))
 ```
 
-![](PA1_template_files/figure-html/unnamed-chunk-17-1.png) 
+![plot of chunk unnamed-chunk-17](figure/unnamed-chunk-17-1.png) 
