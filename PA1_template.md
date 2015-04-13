@@ -1,9 +1,4 @@
----
-title: "Reproducible Research: Peer Assessment 1"
-output: 
-  html_document:
-    keep_md: true
----
+# Reproducible Research: Peer Assessment 1
 
 
 Author: Stefan Stavrev
@@ -31,13 +26,35 @@ The variables included in this dataset are:
 
 The dataset was extracted in the R working directory. Then, it was loaded and checked in R. Also, the date variable/column was converted to type Date. Missing values were present in the dataset and properly read as NA in R.
 
-```{r}
+
+```r
 library(data.table)
 data <- read.csv("activity.csv", header=T, sep=",", na.strings = "NA", nrows=17569, stringsAsFactors=F)
 data$date <- as.Date(data$date)
 data <- data.table(data)
 str(data)
+```
+
+```
+## Classes 'data.table' and 'data.frame':	17568 obs. of  3 variables:
+##  $ steps   : int  NA NA NA NA NA NA NA NA NA NA ...
+##  $ date    : Date, format: "2012-10-01" "2012-10-01" ...
+##  $ interval: int  0 5 10 15 20 25 30 35 40 45 ...
+##  - attr(*, ".internal.selfref")=<externalptr>
+```
+
+```r
 head(data)
+```
+
+```
+##    steps       date interval
+## 1:    NA 2012-10-01        0
+## 2:    NA 2012-10-01        5
+## 3:    NA 2012-10-01       10
+## 4:    NA 2012-10-01       15
+## 5:    NA 2012-10-01       20
+## 6:    NA 2012-10-01       25
 ```
 
 ## What is mean total number of steps taken per day?
@@ -57,35 +74,59 @@ This task is divided into three subtasks:
 The data is grouped by date and then total sum of steps for each day is computed. The result is a new object in R named
 "stepsPerDay" which has two columns: "date"" and "stepsPerDay".
 
-```{r}
+
+```r
 stepsPerDay <- data [, list(stepsPerDay = sum(steps, na.rm=TRUE)), by=date]
 str(stepsPerDay)
+```
+
+```
+## Classes 'data.table' and 'data.frame':	61 obs. of  2 variables:
+##  $ date       : Date, format: "2012-10-01" "2012-10-02" ...
+##  $ stepsPerDay: int  0 126 11352 12116 13294 15420 11015 0 12811 9900 ...
+##  - attr(*, ".internal.selfref")=<externalptr>
 ```
 
 ### Subtasks 2 and 3: Make a histogram of the total number of steps taken each day. Calculate and report the mean and median of the total number of steps taken per day
 
 First, the mean and median values are computed and reported.
 
-```{r}
+
+```r
 stepsPerDayMean <- as.integer(mean(stepsPerDay$stepsPerDay))
 stepsPerDayMedian <- as.integer(median(stepsPerDay$stepsPerDay))
 ```
 
-```{r}
+
+```r
 stepsPerDayMean
+```
+
+```
+## [1] 9354
+```
+
+```r
 stepsPerDayMedian
 ```
 
-The mean of the total number of steps per day, is `r stepsPerDayMean` and the median is `r stepsPerDayMedian`.
+```
+## [1] 10395
+```
+
+The mean of the total number of steps per day, is 9354 and the median is 10395.
 
 Then, a histogram plot was created and the mean and median values were also included in the plot.
 
-```{r}
+
+```r
 hist(stepsPerDay$stepsPerDay, main="Frequency of total number of steps taken each day", xlab = "Total number of steps", col = "cadetblue", breaks=30)
 abline(v=stepsPerDayMean, lwd = 2, col = "chartreuse3")
 abline(v=stepsPerDayMedian, lwd = 2, col = "chocolate1")
 legend("topright", lty = 1, lwd = 2, col = c("chartreuse3", "chocolate1"), legend = c(paste("Mean:", stepsPerDayMean), paste("Median:", stepsPerDayMedian)))
 ```
+
+![](PA1_template_files/figure-html/unnamed-chunk-5-1.png) 
 
 ## What is the average daily activity pattern?
 
@@ -97,7 +138,8 @@ There are two subtasks for this task:
 
 2. Which 5-minute interval, on average across all the days in the dataset, contains the maximum number of steps?
 
-```{r}
+
+```r
 ## Group by interval and compute mean values for steps.
 dataByInterval <- data[, list(avgSteps = mean(steps, na.rm=TRUE)), by=interval]
 
@@ -110,12 +152,26 @@ maxAvgSteps$avgSteps <- as.integer(maxAvgSteps$avgSteps)
 points(maxAvgSteps$interval,  maxAvgSteps$avgSteps, col = 'firebrick2', lwd = 2, pch = 19)
 ```
 
-```{r}
+![](PA1_template_files/figure-html/unnamed-chunk-6-1.png) 
+
+
+```r
 maxAvgSteps$interval
+```
+
+```
+## [1] 835
+```
+
+```r
 maxAvgSteps$avgSteps
 ```
 
-The wanted time interval with maximum number of steps is `r maxAvgSteps$interval` with value for steps `r maxAvgSteps$avgSteps`.
+```
+## [1] 206
+```
+
+The wanted time interval with maximum number of steps is 835 with value for steps 206.
 
 ## Imputing missing values
 
@@ -133,56 +189,98 @@ There are 4 subtasks for this task:
 
 ### Subtask 1: Calculate and report the total number of missing values in the dataset
 
-```{r}
+
+```r
 nrMissing <- sum(is.na(data$steps) | is.na(data$date) | is.na(data$interval))
 ```
 
-There are `r nrMissing` missing values in the dataset.
+There are 2304 missing values in the dataset.
 
 ### Subtask 2 and 3: Devise a strategy for filling in all of the missing values in the dataset. Create a new dataset that is equal to the original dataset but with the missing data filled in
 
 First, let's see which variable/column in the dataset contains NA values.
 
-```{r}
+
+```r
 sum(is.na(data$steps))
+```
+
+```
+## [1] 2304
+```
+
+```r
 sum(is.na(data$date))
+```
+
+```
+## [1] 0
+```
+
+```r
 sum(is.na(data$interval))
+```
+
+```
+## [1] 0
 ```
 
 We see that missing values are present only in the "steps" column. My strategy of filling these missing values is the following.
 I will use the R object "dataByInterval" we created in step 2 of this project: "What is the average daily activity pattern?".
 Each NA value in the "steps" column will be replaced with the corresponding mean value from "dataByInterval".
 
-```{r}
+
+```r
 dataWithoutNA <- data
 dataWithoutNA[is.na(data$steps), 1] <- dataByInterval[is.na(data$steps), 2]
 ```
 
 Let's check to make sure there are no missing values in the new dataset "dataWithoutNA".
 
-```{r}
+
+```r
 sum(is.na(dataWithoutNA$steps))
+```
+
+```
+## [1] 0
 ```
 
 ### Subtask 4: Make a histogram of the total number of steps taken each day and calculate and report the mean and median total number of steps taken per day
 
-```{r}
+
+```r
 stepsPerDay2 <- dataWithoutNA[, list(stepsPerDay = sum(steps, na.rm=TRUE)), by=date]
 stepsPerDay2Mean <- as.integer(mean(stepsPerDay2$stepsPerDay))
 stepsPerDay2Median <- as.integer(median(stepsPerDay2$stepsPerDay))
 ```
 
-```{r}
+
+```r
 stepsPerDay2Mean
+```
+
+```
+## [1] 9429
+```
+
+```r
 stepsPerDay2Median
 ```
 
-```{r}
+```
+## [1] 10395
+```
+
+
+```r
 hist(stepsPerDay2$stepsPerDay, main="Frequency of total number of steps taken each day (No NAs)", xlab = "Total number of steps", col = "cadetblue", breaks=30)
 abline(v=stepsPerDay2Mean, lwd = 2, col = "chartreuse3")
 abline(v=stepsPerDay2Median, lwd = 2, col = "chocolate1")
 legend("topright", lty = 1, lwd = 2, col = c("chartreuse3", "chocolate1"), legend = c(paste("Mean:", stepsPerDay2Mean), paste("Median:", stepsPerDay2Median)))
 ```
+
+![](PA1_template_files/figure-html/unnamed-chunk-14-1.png) 
 
 Question 1: Do these values differ from the estimates from the first part of the assignment?
 
@@ -190,7 +288,7 @@ Yes.
 
 Question 2: What is the impact of imputing missing data on the estimates of the total daily number of steps?
 
-The median value remained the same `r stepsPerDay2Median`, while the mean value increased from `r stepsPerDayMean` to `r stepsPerDay2Mean`.
+The median value remained the same 10395, while the mean value increased from 9354 to 9429.
 
 ## Are there differences in activity patterns between weekdays and weekends?
 
@@ -206,7 +304,8 @@ This task is divided into subtasks:
 
 Create a function that can tell if a day is a weekday or weekend.
 
-```{r}
+
+```r
 weekDayOrEnd = function(date){
   if(date == "Saturday" || date == "Sunday") return("Weekend")
   else return("Weekday")
@@ -215,15 +314,29 @@ weekDayOrEnd = function(date){
 
 Add the factor variable.
 
-```{r}
+
+```r
 dataWithoutNA$weekDayOrEnd <- factor(sapply(weekdays(dataWithoutNA$date), weekDayOrEnd))
 head(dataWithoutNA)
 ```
 
+```
+##    steps       date interval weekDayOrEnd
+## 1:     2 2012-10-01        0      Weekday
+## 2:     2 2012-10-01        5      Weekday
+## 3:     2 2012-10-01       10      Weekday
+## 4:     2 2012-10-01       15      Weekday
+## 5:     2 2012-10-01       20      Weekday
+## 6:     2 2012-10-01       25      Weekday
+```
+
 ### Subtask 2: Make a panel plot
 
-```{r}
+
+```r
 library(lattice)
 dataWithoutNA2 = dataWithoutNA[, list(avgSteps = mean(steps, na.rm = TRUE)), by = list(interval, weekDayOrEnd)]
 xyplot(avgSteps~interval | weekDayOrEnd, data = dataWithoutNA2, type = "l", xlab = 'Interval', ylab = 'Number of Steps', layout = c(1,2))
 ```
+
+![](PA1_template_files/figure-html/unnamed-chunk-17-1.png) 
